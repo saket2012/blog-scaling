@@ -1,0 +1,34 @@
+test_name: Create a user
+
+stages:
+- name: Create a new user
+  request:
+    url: http://localhost:5000/users/register
+    json:
+      username: qwerty123
+      password: qwr123
+      display_name: as
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+    body:
+      Message: "New user is created successfully"
+
+
+- name: Delete a user
+  request:
+    url: http://localhost:5000/users/delete_user
+    json:
+      username: qwerty123
+    auth:
+    - qwerty123
+    - qwr123
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+    body:
+      Message: "User is deleted successfully"
