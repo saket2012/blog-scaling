@@ -10,7 +10,7 @@ def create_user(content):
     conn = get_db()
     c = conn.cursor()
     try:
-        c.execute("""INSERT into users values (?, ?, ?)""", (
+        c.execute("""INSERT into users values (NULL, ?, ?, ?)""", (
             username, hash_password, display_name))
         conn.commit()
     except Exception:
@@ -35,7 +35,6 @@ def delete_user(data):
     username = data['username']
     conn = get_db()
     c = conn.cursor()
-
     try:
         c.execute("""DELETE FROM users WHERE username = ?""", (username,))
         conn.commit()
@@ -46,14 +45,11 @@ def delete_user(data):
 def get_user_details(username):
     conn = get_db()
     c = conn.cursor()
-    try:
-        c.execute("""SELECT password FROM users WHERE username = ?""", (username,))
-        rows = c.fetchone()
-        rows = ''.join(rows)
-        conn.commit()
-        return rows
-    except Exception:
-        conn.rollback()
+    c.execute("""SELECT * FROM users WHERE username = ?""", (username,))
+    rows = c.fetchall()
+    if len(rows) == 0:
+        return False
+    return rows
 
 
 def encode_password(password):
