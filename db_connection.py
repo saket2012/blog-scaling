@@ -1,6 +1,6 @@
 import sqlite3
 
-database = '/Users/saketgonte/Desktop/Projects/twitter/twitter.db'
+database = '/users/saketgonte/Desktop/projects/twitter/twitter.db'
 
 
 def get_db():
@@ -19,9 +19,10 @@ def create_tables():
     c.execute(query)
     query = """CREATE TABLE IF NOT EXISTS articles(
             article_id integer PRIMARY KEY AUTOINCREMENT,
-            user_id integer
+            user_id integer,
             article varchar,
             author varchar,
+            title varchar,
             url varchar,
             post_time integer,
             last_updated_time integer,

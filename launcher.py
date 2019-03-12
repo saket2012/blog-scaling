@@ -1,6 +1,6 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, jsonify
 import user, db_connection, articles
-import json
+import lepl.apps.rfc3696
 
 app = Flask(__name__)
 
@@ -20,20 +20,22 @@ def authorization():
         return False
 
 
-@app.route('/users/register', methods = ['POST'])
+@app.route('/users/register_user', methods = ['POST'])
 def create_user():
     data = request.get_json()
     username = data['username']
+    email_validator = lepl.apps.rfc3696.Email()
+    if not email_validator(username):
+        return jsonify({"Message": "Enter valid details"}), 401
     user_details = user.get_user_details(username)
-    print(user_details)
     if user_details:
-        return jsonify({"Message": "User already exists"}), 401
+        return jsonify({"Message": "User already exists"}), 409
     else:
         user.create_user(data)
         return jsonify({"Message": "New user is created successfully"}), 200
 
 
-@app.route('/users/update', methods = ['POST'])
+@app.route('/users/update_user', methods = ['POST'])
 def update_password():
     data = request.get_json()
     auth = authorization()
@@ -45,8 +47,7 @@ def update_password():
         else:
             return jsonify({"Message": "Username does not match"}), 409
     else:
-        return make_response('Could not verify your login!', 401, {
-            'WWW-Authenticate': 'Basic realm="Login Required"'})
+        return jsonify({"Message": "Could not verify your login!"}), 401
 
 
 @app.route('/users/delete_user', methods = ['POST'])
@@ -62,15 +63,37 @@ def delete_user():
             return jsonify({"Message": "Username does not match"}), 409
 
     else:
-        return make_response('Could not verify your login!', 401, {
-            'WWW-Authenticate': 'Basic realm="Login Required"'})
-    
+        return jsonify({"Message": "Could not verify your login!"}), 401
+
 
 @app.route('/article/post', methods = ['POST'])
 def post_article():
     data = request.get_json()
-    articles.post_article(data)
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    auth = authorization()
+    if auth:
+        authentication = request.authorization
+        user_id = user.get_user_details(authentication.username)
+        user_id = user_id[0]
+        articles.post_article(user_id[0], data)
+        return jsonify({"Message": "Article is posted successfully"}), 200
+
+
+@app.route('/article/edit', methods = ['POST'])
+def edit_article():
+    data = request.get_json()
+    auth = authorization()
+    if auth:
+        authentication = request.authorization
+        user_details = user.get_user_details(authentication.username)
+        user_details = user_details[0]
+        article_id = articles.get_article_details(user_details[0], data)
+        if not article_id:
+            return jsonify({"Message": "Article does not found"}), 401
+        article_id = article_id[0]
+        articles.edit_article(data, article_id[1])
+        return jsonify({"Message": "Article is updated successfully"}), 200
+    else:
+        return jsonify({"Message": "Could not verify your login!"}), 401
 
 
 if __name__ == '__main__':
