@@ -38,11 +38,34 @@ def edit_article(data, article_id):
     c = conn.cursor()
     article = data['article']
     author = data['author']
-    print(article_id)
     last_updated_time = time.time()
+    print(last_updated_time)
     try:
         c.execute("""UPDATE articles SET article = ?, author = ?, last_updated_time = ? WHERE article_id = ?""", (
             article, author, last_updated_time, article_id))
         conn.commit()
     except Exception:
         conn.rollback()
+
+
+def delete_article(article_id):
+    conn = get_db()
+    c = conn.cursor()
+    try:
+        c.execute("""DELETE FROM articles WHERE article_id = ?""", (article_id,))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+
+def get_article(title):
+    conn = get_db()
+    c = conn.cursor()
+    try:
+        c.execute("""SELECT * FROM articles where title = ?""", (title,))
+        rows = c.fetchall()
+        if len(rows) == 0:
+            return False
+        return rows
+    except Exception as e:
+        return e

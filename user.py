@@ -19,7 +19,7 @@ def create_user(content):
 
 def update_password(content):
     username = content['username']
-    password = content['password']
+    password = content['new_password']
     hash_password = encode_password(password)
     conn = get_db()
     c = conn.cursor()

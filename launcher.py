@@ -41,11 +41,11 @@ def update_password():
     auth = authorization()
     if auth:
         authentication = request.authorization
-        if authentication.username == data['username']:
+        if authentication.username == data['username'] and authentication.password == data['password']:
             user.update_password(data)
             return jsonify({"Message": "Password is updated successfully"}), 200
         else:
-            return jsonify({"Message": "Username does not match"}), 409
+            return jsonify({"Message": "Username or password does not match"}), 409
     else:
         return jsonify({"Message": "Could not verify your login!"}), 401
 
@@ -56,12 +56,11 @@ def delete_user():
     auth = authorization()
     if auth:
         authentication = request.authorization
-        if authentication.username == data['username']:
+        if authentication.username == data['username'] and authentication.password == data['password']:
             user.delete_user(data)
             return jsonify({"Message": "User is deleted successfully"}), 200
         else:
-            return jsonify({"Message": "Username does not match"}), 409
-
+            return jsonify({"Message": "Username or password does not match"}), 409
     else:
         return jsonify({"Message": "Could not verify your login!"}), 401
 
@@ -90,10 +89,52 @@ def edit_article():
         if not article_id:
             return jsonify({"Message": "Article does not found"}), 401
         article_id = article_id[0]
-        articles.edit_article(data, article_id[1])
-        return jsonify({"Message": "Article is updated successfully"}), 200
+        article_user_id = article_id[1]
+        if article_user_id == user_details[0]:
+            articles.edit_article(data, article_id[0])
+            return jsonify({"Message": "Article is updated successfully"}), 200
+        else:
+            return jsonify({"Message": "You can only update articles posted by you"}), 401
     else:
         return jsonify({"Message": "Could not verify your login!"}), 401
+
+
+@app.route('/article/delete', methods = ['POST'])
+def delete_article():
+    data = request.get_json()
+    auth = authorization()
+    if auth:
+        authentication = request.authorization
+        user_details = user.get_user_details(authentication.username)
+        user_details = user_details[0]
+        article_id = articles.get_article_details(user_details[0], data)
+        if not article_id:
+            return jsonify({"Message": "Article does not found"}), 401
+        article_id = article_id[0]
+        article_user_id = article_id[1]
+        if article_user_id == user_details[0]:
+            articles.delete_article(article_id[0])
+            return jsonify({"Message": "Article is deleted successfully"}), 200
+        else:
+            return jsonify({"Message": "You can only delete articles posted by you"}), 401
+    else:
+        return jsonify({"Message": "Could not verify your login!"}), 401
+
+
+@app.route('/article/retrieve', methods = ['POST'])
+def retrieve_article():
+    data = request.get_json()
+    title = data['title']
+    article = articles.get_article(title)
+    if not article:
+        return jsonify({"Message": "Article does not found"}), 401
+    article = article[0]
+    title = article[4]
+    author = article[3]
+    text = article[2]
+    return jsonify({"Title": title,
+                    "Author": author,
+                    "Article": text})
 
 
 if __name__ == '__main__':
