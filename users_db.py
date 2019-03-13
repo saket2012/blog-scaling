@@ -2,11 +2,8 @@ from db_connection import get_db
 import hashlib
 
 
-def create_user(content):
-    username = content['username']
-    password = content['password']
+def create_user(username, password, display_name):
     hash_password = encode_password(password)
-    display_name = content['display_name']
     conn = get_db()
     c = conn.cursor()
     try:
@@ -17,10 +14,8 @@ def create_user(content):
         conn.rollback()
 
 
-def update_password(content):
-    username = content['username']
-    password = content['new_password']
-    hash_password = encode_password(password)
+def update_password(username, new_password):
+    hash_password = encode_password(new_password)
     conn = get_db()
     c = conn.cursor()
     try:

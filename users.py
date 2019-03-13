@@ -27,26 +27,38 @@ class Users(Resource):
     def post(self):
         data = request.get_json()
         username = data['username']
+        password = data['password']
+        display_name = data['display_name']
+        print(username)
+        if username == "" or password == "" or display_name == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
         email_validator = lepl.apps.rfc3696.Email()
         if not email_validator(username):
-            response = {'response': "Enter valid details"}
+            response = {'response': "Enter valid Email"}
             return jsonify(response)
         user_details = users_db.get_user_details(username)
         if user_details:
             response = {'response': "Conflict"}
             return jsonify(response)
         else:
-            users_db.create_user(data)
+            users_db.create_user(username, password, display_name)
             response = {'response': "Created"}
             return jsonify(response)
 
     def put(self):
         data = request.get_json()
+        username = data['username']
+        password = data['password']
+        new_password = data['new_password']
+        if username == "" or password == "" or new_password == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
         auth = authorization()
         if auth:
             authentication = request.authorization
-            if authentication.username == data['username'] and authentication.password == data['password']:
-                users_db.update_password(data)
+            if authentication.username == username and authentication.password == password:
+                users_db.update_password(username, new_password)
                 response = {'response': "OK"}
                 return jsonify(response)
             else:
@@ -58,6 +70,11 @@ class Users(Resource):
 
     def delete(self):
         data = request.get_json()
+        username = data['username']
+        password = data['password']
+        if username == "" or password == "" or password == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
         auth = authorization()
         if auth:
             authentication = request.authorization

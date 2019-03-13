@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 import users_db, db_connection, articles_db
 import json
+from flask_restful import Resource, Api
 
 app = Flask(__name__)
+api = Api(app)
 
 
 def authorization():
@@ -20,98 +22,130 @@ def authorization():
         return False
 
 
-@app.route('/article/post', methods = ['POST'])
-def post_article():
-    data = request.get_json()
-    auth = authorization()
-    if auth:
-        authentication = request.authorization
-        user_id = users_db.get_user_details(authentication.username)
-        user_id = user_id[0]
-        articles_db.post_article(user_id[0], data)
-        return jsonify({"Message": "Created"}), 201
-    else:
-        return jsonify({"Message": "Could not verify your login!"}), 401
+class Articles(Resource):
 
-
-@app.route('/article/edit', methods = ['PUT'])
-def edit_article():
-    data = request.get_json()
-    auth = authorization()
-    if auth:
-        authentication = request.authorization
-        user_details = users_db.get_user_details(authentication.username)
-        user_details = user_details[0]
-        article_id = articles_db.get_article_details(user_details[0], data)
-        if not article_id:
-            return jsonify({"Message": "Not Found"}), 404
-        article_id = article_id[0]
-        article_user_id = article_id[1]
-        if article_user_id == user_details[0]:
-            articles_db.edit_article(data, article_id[0])
-            return jsonify({"Message": "OK"}), 200
+    def post(self):
+        data = request.get_json()
+        text = data['text']
+        author = data['author']
+        title = data['title']
+        url = data['url']
+        if text == "" or author == "" or title == "" or url == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
+        auth = authorization()
+        if auth:
+            authentication = request.authorization
+            user_id = users_db.get_user_details(authentication.username)
+            user_id = user_id[0]
+            articles_db.post_article(user_id[0], text, author, title, url)
+            response = {'response': "Created"}
+            return jsonify(response)
         else:
-            return jsonify({"Message": "Unauthorized Access"}), 401
-    else:
-        return jsonify({"Message": "Could not verify your login!"}), 401
+            response = {"Message": "Could not verify your login!"}
+            return jsonify(response)
 
-
-@app.route('/article/delete', methods = ['DELETE'])
-def delete_article():
-    data = request.get_json()
-    auth = authorization()
-    if auth:
-        authentication = request.authorization
-        user_details = users_db.get_user_details(authentication.username)
-        user_details = user_details[0]
-        article_id = articles_db.get_article_details(user_details[0], data)
-        if not article_id:
-            return jsonify({"Message": "Not Found"}), 404
-        article_id = article_id[0]
-        article_user_id = article_id[1]
-        if article_user_id == user_details[0]:
-            articles_db.delete_article(article_id[0])
-            return jsonify({"Message": "OK"}), 200
+    def put(self):
+        data = request.get_json()
+        title = data['title']
+        author = data['author']
+        text = data['text']
+        if text == "" or author == "" or title == "" or text == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
+        auth = authorization()
+        if auth:
+            authentication = request.authorization
+            user_details = users_db.get_user_details(authentication.username)
+            user_details = user_details[0]
+            article_id = articles_db.get_article_details(user_details[0], title)
+            if not article_id:
+                response = {'response': "Not Found"}
+                return jsonify(response)
+            article_id = article_id[0]
+            article_user_id = article_id[1]
+            if article_user_id == user_details[0]:
+                articles_db.edit_article(title, author, text, article_id[0])
+                response = {'response': "OK"}
+                return jsonify(response)
+            else:
+                response = {"Message": "Unauthorized Access"}
+                return jsonify(response)
         else:
-            return jsonify({"Message": "Unauthorized Access"}), 401
-    else:
-        return jsonify({"Message": "Could not verify your login!"}), 401
+            response = {"Message": "Could not verify your login!"}
+            return jsonify(response)
 
+    def delete(self):
+        data = request.get_json()
+        title = data['title']
+        if title == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
+        auth = authorization()
+        if auth:
+            authentication = request.authorization
+            user_details = users_db.get_user_details(authentication.username)
+            user_details = user_details[0]
+            article_id = articles_db.get_article_details(user_details[0], title)
+            if not article_id:
+                response = {'response': "Not Found"}
+                return jsonify(response)
+            article_id = article_id[0]
+            article_user_id = article_id[1]
+            if article_user_id == user_details[0]:
+                articles_db.delete_article(article_id[0])
+                response = {'response': "OK"}
+                return jsonify(response)
+            else:
+                response = {"Message": "Unauthorized Access"}
+                return jsonify(response)
+        else:
+            response = {"Message": "Could not verify your login!"}
+            return jsonify(response)
 
-@app.route('/article/retrieve')
-def get_article():
-    data = request.get_json()
-    title = data['title']
-    article = articles_db.get_article(title)
-    if not article:
-        return jsonify({"Message": "Not Found"}), 404
-    article = article[0]
-    title = article[4]
-    author = article[3]
-    text = article[2]
-    return jsonify({"Title": title,
+    def get(self):
+        data = request.get_json()
+        title = data['title']
+        if title == "":
+            response = {'response': "Enter valid details"}
+            return jsonify(response)
+        article = articles_db.get_article(title)
+        article = article[0]
+        if not article:
+            response = {'response': "Not Found"}
+            return jsonify(response)
+        title = article[4]
+        author = article[3]
+        text = article[2]
+        response = {"Title": title,
                     "Author": author,
-                    "Text": text})
+                    "Text": text}
+        return jsonify(response)
 
 
-@app.route('/article/retrieve_n_most')
-def retrieve_n_most():
-    data = request.get_json()
-    n = data['no_of_articles']
-    n_articles = articles_db.get_n_articles(n)
-    with open('articles.txt', 'w') as article:
-        json.dump(n_articles, article, indent = 4)
-    return jsonify({"Message": "OK"}), 200
+class N_Articles(Resource):
+    def get(self, no_of_articles):
+        n_articles = articles_db.get_n_articles(no_of_articles)
+        if not n_articles:
+            response = {'response': "Not Found"}
+            return jsonify(response)
+        with open('articles.txt', 'w') as article:
+            json.dump(n_articles, article, indent = 4)
+        response = {'response': "OK"}
+        return jsonify(response)
 
 
-@app.route('/article/retrieve_metadata')
-def retrieve_metadata():
-    data = request.get_json()
-    n = data['no_of_articles']
-    n_articles = articles_db.get_articles_metadata(n)
-    with open('articles_metadata.txt', 'w') as article:
-        json.dump(n_articles, article, indent = 4)
-    return jsonify({"Message": "OK"}), 200
+api.add_resource(Articles, '/articles')
+api.add_resource(N_Articles, '/articles/<no_of_articles>')
+
+# @app.route('/article/retrieve_metadata')
+# def retrieve_metadata():
+#     data = request.get_json()
+#     n = data['no_of_articles']
+#     n_articles = articles_db.get_articles_metadata(n)
+#     with open('articles_metadata.txt', 'w') as article:
+#         json.dump(n_articles, article, indent = 4)
+#     return jsonify({"Message": "OK"}), 200
 
 
 if __name__ == '__main__':
