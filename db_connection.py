@@ -20,7 +20,7 @@ def create_tables():
     query = """CREATE TABLE IF NOT EXISTS articles(
             article_id integer PRIMARY KEY AUTOINCREMENT,
             user_id integer,
-            article varchar,
+            text varchar,
             author varchar,
             title varchar,
             url varchar,
