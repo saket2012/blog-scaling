@@ -23,9 +23,8 @@ def create_tables():
             text varchar,
             author varchar,
             title varchar,
-            url varchar,
-            post_time integer,
-            last_updated_time integer,
+            post_time varchar,
+            last_updated_time varchar,
             FOREIGN KEY (user_id) REFERENCES users(user_id))"""
     c.execute(query)
     query = """CREATE TABLE IF NOT EXISTS comments(
@@ -34,7 +33,7 @@ def create_tables():
             article_id integer,
             display_name varchar,
             comment varchar,
-            post_time integer,
+            post_time varchar,
             FOREIGN KEY (user_id) REFERENCES users(user_id),
             FOREIGN KEY (article_id) REFERENCES articles(article_id))"""
     c.execute(query)

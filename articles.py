@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import users_db, db_connection, articles_db
 import json
 from flask_restful import Resource, Api
@@ -29,21 +29,23 @@ class Articles(Resource):
         text = data['text']
         author = data['author']
         title = data['title']
-        url = data['url']
-        if text == "" or author == "" or title == "" or url == "":
-            response = {'response': "Enter valid details"}
-            return jsonify(response)
+        if text == "" or author == "" or title == "":
+            response = Response(status = 400, mimetype = 'application/json')
+            return response
         auth = authorization()
         if auth:
             authentication = request.authorization
             user_id = users_db.get_user_details(authentication.username)
             user_id = user_id[0]
-            articles_db.post_article(user_id[0], text, author, title, url)
-            response = {'response': "Created"}
-            return jsonify(response)
+            articles_db.post_article(user_id[0], text, author, title)
+            article_id = articles_db.get_article(title)
+            article_id = article_id[0]
+            response = Response(status = 201, mimetype = 'application/json')
+            response.headers['location'] = 'http://127.0.0.1:5000/articles/' + str(article_id[0])
+            return response
         else:
-            response = {"Message": "Could not verify your login!"}
-            return jsonify(response)
+            response = Response(status = 401, mimetype = 'application/json')
+            return response
 
     def put(self):
         data = request.get_json()
@@ -51,8 +53,8 @@ class Articles(Resource):
         author = data['author']
         text = data['text']
         if text == "" or author == "" or title == "" or text == "":
-            response = {'response': "Enter valid details"}
-            return jsonify(response)
+            response = Response(status = 400, mimetype = 'application/json')
+            return response
         auth = authorization()
         if auth:
             authentication = request.authorization
@@ -60,27 +62,27 @@ class Articles(Resource):
             user_details = user_details[0]
             article_id = articles_db.get_article_details(user_details[0], title)
             if not article_id:
-                response = {'response': "Not Found"}
-                return jsonify(response)
+                response = Response(status = 404, mimetype = 'application/json')
+                return response
             article_id = article_id[0]
             article_user_id = article_id[1]
             if article_user_id == user_details[0]:
                 articles_db.edit_article(title, author, text, article_id[0])
-                response = {'response': "OK"}
-                return jsonify(response)
+                response = Response(status = 200, mimetype = 'application/json')
+                return response
             else:
-                response = {"Message": "Unauthorized Access"}
-                return jsonify(response)
+                response = Response(status = 401, mimetype = 'application/json')
+                return response
         else:
-            response = {"Message": "Could not verify your login!"}
-            return jsonify(response)
+            response = Response(status = 401, mimetype = 'application/json')
+            return response
 
     def delete(self):
         data = request.get_json()
         title = data['title']
         if title == "":
-            response = {'response': "Enter valid details"}
-            return jsonify(response)
+            response = Response(status = 400, mimetype = 'application/json')
+            return response
         auth = authorization()
         if auth:
             authentication = request.authorization
@@ -88,51 +90,62 @@ class Articles(Resource):
             user_details = user_details[0]
             article_id = articles_db.get_article_details(user_details[0], title)
             if not article_id:
-                response = {'response': "Not Found"}
-                return jsonify(response)
+                response = Response(status = 404, mimetype = 'application/json')
+                return response
             article_id = article_id[0]
             article_user_id = article_id[1]
             if article_user_id == user_details[0]:
                 articles_db.delete_article(article_id[0])
-                response = {'response': "OK"}
-                return jsonify(response)
+                response = Response(status = 200, mimetype = 'application/json')
+                return response
             else:
-                response = {"Message": "Unauthorized Access"}
-                return jsonify(response)
+                response = Response(status = 401, mimetype = 'application/json')
+                return response
         else:
-            response = {"Message": "Could not verify your login!"}
-            return jsonify(response)
+            response = Response(status = 401, mimetype = 'application/json')
+            return response
 
     def get(self):
         data = request.get_json()
         title = data['title']
         if title == "":
-            response = {'response': "Enter valid details"}
-            return jsonify(response)
-        article = articles_db.get_article(title)
-        article = article[0]
-        if not article:
-            response = {'response': "Not Found"}
-            return jsonify(response)
-        title = article[4]
-        author = article[3]
-        text = article[2]
-        response = {"Title": title,
-                    "Author": author,
-                    "Text": text}
-        return jsonify(response)
+            response = Response(status = 400, mimetype = 'application/json')
+            return response
+        auth = authorization()
+        if auth:
+            article = articles_db.get_article(title)
+            if not article:
+                response = Response(status = 404, mimetype = 'application/json')
+                return response
+            article = article[0]
+
+            title = article[4]
+            author = article[3]
+            text = article[2]
+            response = {"Title": title,
+                        "Author": author,
+                        "Text": text}
+            return response
+        else:
+            response = Response(status = 401, mimetype = 'application/json')
+            return response
 
 
 class N_Articles(Resource):
     def get(self, no_of_articles):
-        n_articles = articles_db.get_n_articles(no_of_articles)
-        if not n_articles:
-            response = {'response': "Not Found"}
-            return jsonify(response)
-        with open('articles.txt', 'w') as article:
-            json.dump(n_articles, article, indent = 4)
-        response = {'response': "OK"}
-        return jsonify(response)
+        auth = authorization()
+        if auth:
+            n_articles = articles_db.get_n_articles(no_of_articles)
+            if not n_articles:
+                response = Response(status = 404, mimetype = 'application/json')
+                return response
+            with open('articles.txt', 'w') as article:
+                json.dump(n_articles, article, indent = 4)
+            response = Response(status = 200, mimetype = 'application/json')
+            return response
+        else:
+            response = Response(status = 401, mimetype = 'application/json')
+            return response
 
 
 api.add_resource(Articles, '/articles')
