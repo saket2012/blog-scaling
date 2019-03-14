@@ -1,0 +1,27 @@
+Users:
+
+1) Create a new user:
+curl -i --header "Content-Type: application/json" --request POST --data '{"username":"xyz@gmail.com", "password":"123", "display_name":"XYZ"}'   http://localhost:5000/users
+
+2) Update a user:
+curl -i --header "Content-Type: application/json" --request PUT --user xyz@gmail.com:123 --data '{"username":"xyz@gmail.com", "password":"123", "new_password":"XYZ"}'   http://localhost:5000/users
+
+3) Delete a user:
+curl -i --header "Content-Type: application/json" --request DELETE --user x88yz@gmail.com:XYZ --data '{"username":"xyz@gmail.com", "password":"XYZ"}'   http://localhost:5000/users
+
+
+Articles:
+1) Post an article
+curl -i --header "Content-Type: application/json" --request POST --user xyz@gmail.com:123 --data '{"text":"qwertyuiop", "author":"QWE", "title":"qwe.com"}'   http://localhost:5001/articles
+
+2) Edit an article
+curl -i --header "Content-Type: application/json" --request PUT --user xyz@gmaisl.com:123 --data '{"text":"qweqwertyuwdqwdqwdqwiop", "author":"QWE", "title":"123456"}'   http://localhost:5001/articles
+
+3) Delete an article
+curl -i --header "Content-Type: application/json" --request DELETE --user xyz8@gmail.com:123 --data '{"title":"qwe.mcom"}'   http://localhost:5001/articles
+
+4) Get an article
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"title":"qwe.com"}'   http://localhost:5001/articles
+
+5) Get n articles
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data http://localhost:5001/articles/15
