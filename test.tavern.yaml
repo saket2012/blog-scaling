@@ -1,34 +1,178 @@
-test_name: Create a user
+---
+test_name: Change the password of a user that does not exists
+stages:
+- name: Change the password of a user that does not exists
+  request:
+    url: http://localhost:5000/users
+    json:
+      username: saket@gmail.com
+      password: qwe
+      new_password: asd
+    method: PATCH
+    auth:
+    - saket@gmail.com
+    - qwe
+    headers:
+      content-type: application/json
+  response:
+    status_code: 404
+---
 
+---
+test_name: Create a user
 stages:
 - name: Create a new user
   request:
-    url: http://localhost:5000/users/register
+    url: http://localhost:5000/users
     json:
-      username: qwerty123
-      password: qwr123
-      display_name: as
+      username: saket@gmail.com
+      password: asd
+      display_name: Saket
     method: POST
     headers:
       content-type: application/json
   response:
+    status_code: 201
+---
+
+---
+test_name: Change the password
+stages:
+- name: Change the password
+  request:
+    url: http://localhost:5000/users
+    json:
+      username: saket@gmail.com
+      password: asd
+      new_password: zxc
+    method: PATCH
+    auth:
+    - saket@gmail.com
+    - asd
+    headers:
+      content-type: application/json
+  response:
     status_code: 200
-    body:
-      Message: "New user is created successfully"
+---
+
+---
+test_name: Delete a user
+stages:
+- name: Delete a user
+  request:
+    url: http://localhost:5000/users
+    json:
+      username: saket@gmail.com
+      password: zxc
+    auth:
+    - saket@gmail.com
+    - zxc
+    method: DELETE
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+---
+
+---
+test_name: Change the password for deleted user
+stages:
+- name: Change the password
+  request:
+    url: http://localhost:5000/users
+    json:
+      username: saket@gmail.com
+      password: zxc
+      new_password: asd
+    method: PATCH
+    auth:
+    - saket@gmail.com
+    - zxc
+    headers:
+      content-type: application/json
+  response:
+    status_code: 404
+---
+
+---
+test_name: Create a user
+stages:
+- name: Create a new user
+  request:
+    url: http://localhost:5000/users
+    json:
+      username: saket@gmail.com
+      password: asd
+      display_name: Saket
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+---
 
 
-#- name: Delete a user
-#  request:
-#    url: http://localhost:5000/users/delete_user
-#    json:
-#      username: qwerty123
-#    auth:
-#    - qwerty123
-#    - qwr123
-#    method: POST
-#    headers:
-#      content-type: application/json
-#  response:
-#    status_code: 200
-#    body:
-#      Message: "User is deleted successfully"
+---
+test_name: Post an article with wrong password
+stages:
+- name: Post an article with wrong password
+  request:
+    url: http://localhost:5001/articles
+    method: POST
+    auth:
+    - saket@gmail.com
+    - zxc
+    json:
+      text: Article
+      author: Saket
+      title: 1st article
+    headers:
+      content-type: application/json
+  response:
+    status_code: 401
+---
+
+---
+test_name: Post an article
+stages:
+- name: Post an article
+  request:
+    url: http://localhost:5001/articles
+    method: POST
+    auth:
+    - saket@gmail.com
+    - asd
+    json:
+      text: Article
+      author: Saket
+      title: 1st article
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+---
+
+---
+test_name: Retrieve recent article
+stages:
+- name: Retrieve recent article
+  request:
+    url: http://localhost:5001/articles
+    method: GET
+    auth:
+    - saket@gmail.com
+    - asd
+    json:
+      title: 1st article
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+---
+
+
+
+
+
+
+

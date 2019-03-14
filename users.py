@@ -49,7 +49,7 @@ class Users(Resource):
             response = Response(status = 201, mimetype = 'application/json')
             return response
 
-    def put(self):
+    def patch(self):
         data = request.get_json()
         username = data['username']
         password = data['password']
