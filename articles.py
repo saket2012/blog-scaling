@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response, make_response
+from flask import Flask, request, jsonify, Response
 import users_db, db_connection, articles_db
 import json
 from flask_restful import Resource, Api
@@ -50,8 +50,7 @@ class Articles(Resource):
                 article_id = articles_db.get_article(title)
                 article_id = article_id[0]
                 response = Response("article is created",status = 201, mimetype = 'application/json')
-                response.headers['location'] = 'http://127.0.0.1:5000/articles/' + str(article_id[0])
-                response.body = 'Article' + title + 'is added'
+                response.headers['location'] = article_id[5]
                 return response
             else:
                 # Unauthorized access

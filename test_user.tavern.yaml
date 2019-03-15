@@ -126,6 +126,7 @@ stages:
       text: Article
       author: Saket
       title: 1st article
+      url: abc.com
     headers:
       content-type: application/json
   response:
@@ -146,6 +147,7 @@ stages:
       text: Article
       author: Saket
       title: 1st article
+      url: abc.com
     headers:
       content-type: application/json
   response:
@@ -166,6 +168,7 @@ stages:
       text: Article
       author: Saket
       title: 1st article
+      url: abc.com
     headers:
       content-type: application/json
   response:

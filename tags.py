@@ -25,32 +25,49 @@ def authorization():
 
 
 class Tags(Resource):
-# @app.route('/tag/post', methods = ['POST'])
     def post(self):
         data = request.get_json()
         tag_name = data['tag_name']
         url = data['url']
         if tag_name == '' or url == '':
-            return jsonify({"Message": "BAD REQUEST"}), 400
+            response = app.response_class(response=json.dumps({"message": "Bad Request"}, indent=4),
+                                          status=400,
+                                          content_type='application/json')
+            return response
         auth = authorization()
-        article_url = articles_db.get_article_by_url(url)
-        if not article_url:
-            return jsonify({"Message": "Not Found"}), 404
         if auth is not None:
             if auth:
+                article_url = articles_db.get_article_by_url(url)
+                if not article_url:
+                    response = app.response_class(response=json.dumps({"message": "NOT FOUND"}, indent=4),
+                                                  status=404,
+                                                  content_type='application/json')
+                    return response
                 tags_db.post_tag(tag_name, url)
-                return jsonify({"Message": "Created"}), 201
+                response = app.response_class(response=json.dumps({"message": "Created"}, indent=4),
+                                              status=201,
+                                              content_type='application/json')
+                return response
             else:
-                    return jsonify({"Message": "Could not verify your login!"}), 401
+                response = app.response_class(response=json.dumps({"message": "CONFLICT"}, indent=4),
+                                              status=409,
+                                              content_type='application/json')
+                return response
         else:
-            return jsonify({"Message": "NOT FOUND"}), 404
+            response = app.response_class(response=json.dumps({"message": "NOT FOUND"}, indent=4),
+                                          status=404,
+                                          content_type='application/json')
+            return response
 
     def delete(self):
         data = request.get_json()
         auth = authorization()
         url = data['url']
         if url == '':
-            return jsonify({"Message": "BAD REQUEST"}), 400
+            response = app.response_class(response=json.dumps({"message": "BAD REQUEST"}, indent=4),
+                                          status=400,
+                                          content_type='application/json')
+            return response
         if auth is not None:
             if auth:
                 tag = tags_db.get_tag_details(url)
@@ -59,20 +76,35 @@ class Tags(Resource):
                     return jsonify({"Message": "Not Found"})
                 tag = tag[0]
                 tags_db.delete_tag(tag[0])
-                return jsonify({"Message": "OK"}), 200
+                response = app.response_class(response=json.dumps({"message": "OK"}, indent=4),
+                                              status=200,
+                                              content_type='application/json')
+                return response
             else:
-                return jsonify({"Message": "Unauthorized Access"}), 401
+                response = app.response_class(response=json.dumps({"message": "UNAUTHORIZED ACCESS"}, indent=4),
+                                              status=401,
+                                              content_type='application/json')
+                return response
         else:
-            return jsonify({"Message": "Could not verify your login!"}), 401
+            response = app.response_class(response=json.dumps({"message": "UNAUTHORIZED ACCESS"}, indent=4),
+                                          status=401,
+                                          content_type='application/json')
+            return response
 
     def get(self):
         data = request.get_json()
         tag_name = data['tag_name']
         if tag_name == '':
-            return jsonify({"Message": "BAD REQUEST"}), 400
+            response = app.response_class(response=json.dumps({"message": "BAD REQUEST"}, indent=4),
+                                          status=400,
+                                          content_type='application/json')
+            return response
         tags = tags_db.get_tag_by_tag_name(tag_name)
         if not tags:
-            return jsonify({"Message": "Not Found"}), 404
+            response = app.response_class(response=json.dumps({"message": "NOT FOUND"}, indent=4),
+                                          status=404,
+                                          content_type='application/json')
+            return response
         return jsonify({"Tags": tags})
 
 
@@ -81,10 +113,16 @@ class TagsByURL(Resource):
         data = request.get_json()
         url = data['url']
         if url == '':
-            return jsonify({"Message": "BAD REQUEST"}), 400
+            response = app.response_class(response=json.dumps({"message": "BAD REQUEST"}, indent=4),
+                                          status=400,
+                                          content_type='application/json')
+            return response
         tags = tags_db.get_tags_by_url(url)
         if not tags:
-            return jsonify({"Message": "Not Found"})
+            response = app.response_class(response=json.dumps({"message": "NOT FOUND"}, indent=4),
+                                          status=404,
+                                          content_type='application/json')
+            return response
         return jsonify({"Tags": tags})
 
 api.add_resource(Tags, '/tags')

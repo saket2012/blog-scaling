@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, Response
 import users_db, db_connection
-import lepl.apps.rfc3696
 from flask_restful import Resource, Api
 import json
 
@@ -32,13 +31,6 @@ class Users(Resource):
         display_name = data['display_name']
         # Check NULL condition of all fields
         if username == "" or password == "" or display_name == "":
-            response = app.response_class(response = json.dumps({"message":"Bad Request"}, indent = 4),
-                                          status = 400,
-                                          content_type = 'application/json')
-            return response
-        email_validator = lepl.apps.rfc3696.Email()
-        if not email_validator(username):
-            # Email validation
             response = app.response_class(response = json.dumps({"message":"Bad Request"}, indent = 4),
                                           status = 400,
                                           content_type = 'application/json')
