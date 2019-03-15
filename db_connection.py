@@ -23,6 +23,7 @@ def create_tables():
             text varchar,
             author varchar,
             title varchar,
+            url varchar,
             post_time varchar,
             last_updated_time varchar,
             FOREIGN KEY (user_id) REFERENCES users(user_id))"""
@@ -39,8 +40,8 @@ def create_tables():
     c.execute(query)
     query = """CREATE TABLE IF NOT EXISTS tags(
             tag_id integer PRIMARY KEY AUTOINCREMENT,
-            tag_desc varchar,
-            url_new varchar,
-            url_existing varchar)"""
+            tag_name varchar,
+            url varchar,
+            post_time integer)"""
     c.execute(query)
     conn.commit()

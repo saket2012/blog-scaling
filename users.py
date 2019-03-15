@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, Response
 import users_db, db_connection
 import lepl.apps.rfc3696
 from flask_restful import Resource, Api
+import json
 
 app = Flask(__name__)
 api = Api(app)
@@ -31,22 +32,30 @@ class Users(Resource):
         display_name = data['display_name']
         # Check NULL condition of all fields
         if username == "" or password == "" or display_name == "":
-            response = Response(status = 400, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message":"Bad Request"}, indent = 4),
+                                          status = 400,
+                                          content_type = 'application/json')
             return response
         email_validator = lepl.apps.rfc3696.Email()
         if not email_validator(username):
             # Email validation
-            response = Response(status = 400, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message":"Bad Request"}, indent = 4),
+                                          status = 400,
+                                          content_type = 'application/json')
             return response
         user_details = users_db.get_user_details(username)
         if user_details:
             #User already exists
-            response = Response(status = 409, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message":"Conflict"}, indent = 4),
+                                          status = 409,
+                                          content_type = 'application/json')
             return response
         else:
             # Create a new user
             users_db.create_user(username, password, display_name)
-            response = Response(status = 201, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message": "Created"}, indent = 4),
+                                          status = 201,
+                                          content_type = 'application/json')
             return response
 
     def patch(self):
@@ -56,7 +65,9 @@ class Users(Resource):
         new_password = data['new_password']
         # Check NULL condition of all fields
         if username == "" or password == "" or new_password == "":
-            response = Response(status = 400, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message": "Bad Request"}, indent = 4),
+                                          status = 400,
+                                          content_type = 'application/json')
             return response
         auth = authorization()
         # Check authentication
@@ -65,19 +76,27 @@ class Users(Resource):
                 authentication = request.authorization
                 if authentication.username == username and authentication.password == password:
                     users_db.update_password(username, new_password)
-                    response = Response(status = 200, mimetype = 'application/json')
+                    response = app.response_class(response = json.dumps({"message": "OK"}, indent = 4),
+                                                  status = 200,
+                                                  content_type = 'application/json')
                     return response
                 else:
                     # Unauthorized access
-                    response = Response(status = 401, mimetype = 'application/json')
+                    response = app.response_class(response = json.dumps({"message": "Unauthorized"}, indent = 4),
+                                                  status = 401,
+                                                  content_type = 'application/json')
                     return response
             else:
                 # Unauthorized access
-                response = Response(status = 401, mimetype = 'application/json')
+                response = app.response_class(response = json.dumps({"message": "Unauthorized"}, indent = 4),
+                                              status = 401,
+                                              content_type = 'application/json')
                 return response
         else:
             # User not found
-            response = Response(status = 404, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message": "Not Found"}, indent = 4),
+                                          status = 404,
+                                          content_type = 'application/json')
             return response
 
     def delete(self):
@@ -86,7 +105,9 @@ class Users(Resource):
         password = data['password']
         # Check NULL condition of all fields
         if username == "" or password == "" or password == "":
-            response = Response(status = 400, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message": "Bad Request"}, indent = 4),
+                                          status = 400,
+                                          content_type = 'application/json')
             return response
         auth = authorization()
         # Check authentication
@@ -96,19 +117,27 @@ class Users(Resource):
                 if authentication.username == data['username'] and authentication.password == data['password']:
                     # Delete a user
                     users_db.delete_user(data)
-                    response = Response(status = 200, mimetype = 'application/json')
+                    response = app.response_class(response = json.dumps({"message": "OK"}, indent = 4),
+                                                  status = 200,
+                                                  content_type = 'application/json')
                     return response
                 else:
                     # Unauthorized access
-                    response = Response(status = 401, mimetype = 'application/json')
+                    response = app.response_class(response = json.dumps({"message": "Unauthorized"}, indent = 4),
+                                                  status = 401,
+                                                  content_type = 'application/json')
                     return response
             else:
                 # Unauthorized access
-                response = Response(status = 401, mimetype = 'application/json')
+                response = app.response_class(response = json.dumps({"message": "Unauthorized"}, indent = 4),
+                                              status = 401,
+                                              content_type = 'application/json')
                 return response
         else:
             # User not found
-            response = Response(status = 404, mimetype = 'application/json')
+            response = app.response_class(response = json.dumps({"message": "Not Found"}, indent = 4),
+                                          status = 404,
+                                          content_type = 'application/json')
             return response
 
 
