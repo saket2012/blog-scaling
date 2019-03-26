@@ -1,17 +1,26 @@
-# twitter
+# Blog
 
-To run the application:
-python3 launcher.py
+1) Install all the dependencies by using following command
+pip3 install -r requirements.txt
 
-Change the username and password for each request. 
-Create a new user:
-curl --header "Content-Type: application/json" --request POST   --data '{"username":"xyz", "password":"123", "display_name":"abc"}'   http://localhost:5000/users/register
+2) To install foreman type following command
+On MacOS:
+npm install foreman
+On Ubuntu:
+sudo apt install --yes ruby-foreman
 
-Update password:
-curl --header "Content-Type: application/json" --request POST  --user xyz:121233 --data '{"username":"xyz", "password":"123"}'   http://localhost:5000/users/update
+3) Start the application by typing following commands
+On MacOS:
+nf start
+On Ubuntu:
+foreman start
 
-Delete a user:
-curl --header "Content-Type: application/json" --request POST  --user xyz:121233 --data '{"username":"xyz"}'   http://localhost:5000/users/delete_user
+4)Use the curl commands given in curl_commands.txt
 
-To tun the test:
-py.test test.tavern.yaml
+5)To run the tests, type following commands
+For users and articles:
+py.test test_user.tavern.yaml -v
+For tags:
+py.test test_tag.tavern.yaml -v
+For comments:
+py.test test_comments.tavern.yaml -v
