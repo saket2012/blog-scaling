@@ -229,9 +229,9 @@ class Article_Metadata(Resource):
 
 api.add_resource(Articles, '/articles') # Route 1
 api.add_resource(N_Articles, '/articles/<no_of_articles>') # Route 2
-api.add_resource(Article_Metadata, '/articles_metadata/<no_of_articles>') # Route 2
+api.add_resource(Article_Metadata, '/articles_metadata/<no_of_articles>') # Route 3
 
 
 if __name__ == '__main__':
     db_connection.create_tables()
-    app.run(debug = True, host = '0.0.0.0', port = 5001)
+    app.run(debug = True, host = '0.0.0.0')

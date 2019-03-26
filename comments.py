@@ -2,9 +2,11 @@ from db_connection import get_db
 from flask import request, Flask, jsonify
 from datetime import datetime
 import users_db
+import json
 from flask_restful import Api, Resource
 app = Flask(__name__)
 api = Api(app)
+
 
 def authorization():
     auth = request.authorization
@@ -34,6 +36,7 @@ def get_article_id(data):
     article_id = row[0]
     return article_id
 
+
 class Comments(Resource):
     def post(self):
         # Add Comment
@@ -61,8 +64,10 @@ class Comments(Resource):
             row = c.fetchone()
             article_id = row[0]
         except Exception:
-            error_msg = "Article Not Found"
-            return jsonify(error_msg), 404
+            response = app.response_class(response=json.dumps({"message": "Article Not Found"}, indent=4),
+                                          status=404,
+                                          content_type='application/json')
+            return response
 
         if row != None:
             try:
@@ -81,8 +86,10 @@ class Comments(Resource):
             resp.status_code = 201
             return resp
         else:
-            error_msg = "Failed to add Comment"
-            return jsonify(error_msg), 409
+            response = app.response_class(response=json.dumps({"message": "Failed to add Comment"}, indent=4),
+                                          status=409,
+                                          content_type='application/json')
+            return response
 
 
 # curl --include --verbose --request DELETE --header 'Content-Type: application/json' --data '{"comment_id" : "1"}' http://localhost:5000/comments/delete
@@ -103,18 +110,27 @@ class Comments(Resource):
                     c.execute("""DELETE from comments where comment_id  == (?)""", (
                         comment_id))
                     conn.commit()
-                    resp = "Successfully deleted Comment with Comment ID " + comment_id
-                    return jsonify(resp), 200
+                    response = app.response_class(response=json.dumps({"message": "Successfully deleted"}, indent=4),
+                                                  status=200,
+                                                  content_type='application/json')
+                    return response
                 else:
-                    resp = "Record Not Found"
-                    return jsonify(resp), 404
+                    response = app.response_class(response=json.dumps({"message": "Record Not Found"}, indent=4),
+                                                  status=404,
+                                                  content_type='application/json')
+                    return response
             except Exception:
                 conn.rollback()
-                return jsonify(message="Failed"), 409
+                response = app.response_class(response=json.dumps({"message": "Failed"}, indent=4),
+                                              status=409,
+                                              content_type='application/json')
+                return response
         else:
             error_msg = "Need User Authentication to perform the DELETE Operation"
-            return jsonify(error_msg), 401
-
+            response = app.response_class(response=json.dumps({"message": "Need User Authentication to perform the DELETE Operation"}, indent=4),
+                                          status=401,
+                                          content_type='application/json')
+            return response
 
 # curl --include --verbose --request GET --header 'Content-Type: application/json' --data '{"article_id" : "3"}' http://localhost:5000/comments/getnumber
     def get(self):
@@ -168,4 +184,4 @@ api.add_resource(Comments, "/comments")
 api.add_resource(N_Comments, "/ncomments")
 
 if __name__ == '__main__':
-    app.run(debug = True, host = '0.0.0.0', port = 5002)
+    app.run(debug = True, host = '0.0.0.0')

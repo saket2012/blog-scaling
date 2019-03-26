@@ -117,7 +117,7 @@ test_name: Post an article without authenticating
 stages:
 - name: Post an article with wrong password
   request:
-    url: http://localhost:5001/articles
+    url: http://localhost:5100/articles
     method: POST
     auth:
     - saket123@gmail.com
@@ -138,7 +138,7 @@ test_name: Post an article with wrong password
 stages:
 - name: Post an article with wrong password
   request:
-    url: http://localhost:5001/articles
+    url: http://localhost:5100/articles
     method: POST
     auth:
     - saket@gmail.com
@@ -159,7 +159,7 @@ test_name: Post an article
 stages:
 - name: Post an article
   request:
-    url: http://localhost:5001/articles
+    url: http://localhost:5100/articles
     method: POST
     auth:
     - saket@gmail.com
@@ -180,7 +180,7 @@ test_name: Retrieve recent article
 stages:
 - name: Retrieve recent article
   request:
-    url: http://localhost:5001/articles
+    url: http://localhost:5100/articles
     method: GET
     auth:
     - saket@gmail.com

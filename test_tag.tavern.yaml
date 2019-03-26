@@ -1,0 +1,113 @@
+---
+test_name: Create a user
+stages:
+- name: Create a new user
+  request:
+    url: http://localhost:5000/users
+    json:
+      username: qwe@gmail.com
+      password: asd
+      display_name: Saket
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+---
+
+---
+test_name: Post an article
+stages:
+- name: Post an article
+  request:
+    url: http://localhost:5100/articles
+    method: POST
+    auth:
+    - qwe@gmail.com
+    - asd
+    json:
+      text: Article
+      author: Saket
+      title: 1st article
+      url: abc.com
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+---
+
+---
+test_name: add an article with new tag.
+stages:
+- name: tag added.
+  request:
+    url: "http://localhost:5300/tags"
+    method: POST
+    auth:
+      - qwe@gmail.com
+      - asd
+    json:
+      tag_name: python
+      url: abc.com
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+---
+
+---
+test_name: list all articles with the new tag.
+stages:
+- name: articles listed.
+  request:
+    url: "http://localhost:5300/tags"
+    method: GET
+    auth:
+      - qwe@gmail.com
+      - asd
+    json:
+      tag_name: python
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+---
+
+---
+test_name: Add another tag to an article.
+stages:
+- name: tag added.
+  request:
+    url: "http://localhost:5300/tags"
+    method: POST
+    auth:
+      - qwe@gmail.com
+      - asd
+    json:
+      tag_name: flask
+      url: abc.com
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+---
+
+---
+test_name: Delete tags from article.
+stages:
+- name: tag deleted.
+  request:
+    url: "http://localhost:5300/tags"
+    auth:
+      - qwe@gmail.com
+      - asd
+    json:
+      url: abc.com
+    method: DELETE
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+---
+
+---

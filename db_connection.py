@@ -1,6 +1,6 @@
 import sqlite3
 
-database = '/users/saketgonte/Desktop/projects/twitter/twitter.db'
+database = 'twitter.db'
 
 
 def get_db():
@@ -43,5 +43,8 @@ def create_tables():
             tag_name varchar,
             url varchar,
             post_time integer)"""
+    c.execute(query)
+
+    query = "PRAGMA foreign_keys = ON"
     c.execute(query)
     conn.commit()

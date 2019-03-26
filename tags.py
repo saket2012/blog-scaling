@@ -72,7 +72,6 @@ class Tags(Resource):
             if auth:
                 tag = tags_db.get_tag_details(url)
                 if not tag:
-                    print(1)
                     return jsonify({"Message": "Not Found"})
                 tag = tag[0]
                 tags_db.delete_tag(tag[0])
@@ -128,38 +127,7 @@ class TagsByURL(Resource):
 api.add_resource(Tags, '/tags')
 api.add_resource(TagsByURL, '/tags_url')
 
-# @app.route('/tag/retrieve_metadata')
-# def retrieve_metadata():
-#     data = request.get_json()
-#     n = data['no_of_tags']
-#     n_tags = tags_db.get_tags_metadata(n)
-#     with open('tags_metadata.txt', 'w') as tag:
-#         json.dump(n_tags, tag, indent = 4)
-#     return jsonify({"Message": "OK"}), 200
-
 
 if __name__ == '__main__':
     db_connection.create_tables()
-    app.run(debug = True, host = '0.0.0.0', port = 5003)
-
-
-
-
-# @app.route('tag/add_article_new_tag')
-# def add_article():
-#     data = request.get_json()
-#     return ''
-#
-# @app.route('tag/all_article')
-# def all_article():
-#     data = request.get_json()
-#     tag_name = data['tag_name']
-#     tag = tags_db.get_tag(tag_name)
-#     if tag == articles_db.get_n_articles(data):
-#         articles_db.get_n_articles(data)
-#         with open('articles.txt', 'w') as tag:
-#             json.dump(tag, articles_db.get_n_articles(data), indent=4)
-#         return jsonify({"Message": "OK"}), 200
-#     else:
-#        return jsonify({"Message": "Unauthorized Access"}), 401
-#
+    app.run(debug = True, host = '0.0.0.0')
