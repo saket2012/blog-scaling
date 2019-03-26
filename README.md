@@ -1,6 +1,6 @@
 # Blog
 
-1) Install all the dependencies by using following command
+1) Install the dependencies by using following command
 pip3 install -r requirements.txt
 
 2) To install foreman type following command
