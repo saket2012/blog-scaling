@@ -4,9 +4,52 @@ from datetime import datetime
 import users_db
 import json
 from flask_restful import Api, Resource
+from flask_httpauth import HTTPBasicAuth
+from functools import wraps
+from passlib.hash import sha256_crypt
+
 app = Flask(__name__)
 api = Api(app)
+auth = HTTPBasicAuth()
 
+@auth.verify_password
+def verify(username, password):
+    global author
+    passwd = users_db.get_user_details(username)
+    if passwd:
+        passwd = passwd[0]
+        passwd = passwd[2]
+        if sha256_crypt.verify(password, passwd):
+            return True
+        else:
+            author = "Anonymous Coward"
+            return False
+    else:
+        author = "Anonymous Coward"
+        return False
+
+
+def check_auth(username, password):
+    return verify(username,password)
+
+def authenticate():
+    response = app.response_class(response = json.dumps({"message": "NOT FOUND"}, indent = 4),
+                                  status = 404,
+                                  content_type = 'application/json')
+    return response
+
+
+def author(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        global author
+        if not auth or not check_auth(auth.username, auth.password):
+            author = 'Anonymous Coward'
+        else:
+            author= auth.username
+        return f(*args, **kwargs)
+    return decorated
 
 def authorization():
     auth = request.authorization
@@ -24,6 +67,7 @@ def authorization():
         return False
 
 
+
 def get_article_id(data):
     title = data['title']
     author = data['author']
@@ -38,29 +82,28 @@ def get_article_id(data):
 
 
 class Comments(Resource):
-    def post(self):
-        # Add Comment
 
+    @author
+    def post(self):
         data = request.get_json()
         title = data['title']
-        author = data['author']
+        author_name = data['author']
         comment = data['comment']
         post_time = datetime.now()
         success_flag = 0
 
-        auth = authorization()
-        if auth:
+        if author == "Anonymous Coward":
+            user_id = -1
+            display_name = "Anonymous Coward"
+        else:
             user_id = data['user_id']
             display_name = data['display_name']
-        else:
-            user_id = -1
-            display_name = "Anonymous  Coward"
 
         conn = get_db()
         c = conn.cursor()
         try:
             c.execute("""SELECT * from articles where title == (?) and author == (?)""", (
-                title,author))
+                title, author_name))
             row = c.fetchone()
             article_id = row[0]
         except Exception:
@@ -92,47 +135,30 @@ class Comments(Resource):
             return response
 
 
-# curl --include --verbose --request DELETE --header 'Content-Type: application/json' --data '{"comment_id" : "1"}' http://localhost:5000/comments/delete
     def delete(self):
         # Delete an individual comment
-
-        auth = authorization()
-        if auth:
-            data = request.get_json()
-            comment_id = data['comment_id']
-            conn = get_db()
-            c = conn.cursor()
-            try:
-                c.execute("""SELECT * from comments where comment_id == (?)""", (
-                    comment_id))
-                row = c.fetchone()
-                if row:
-                    c.execute("""DELETE from comments where comment_id  == (?)""", (
-                        comment_id))
-                    conn.commit()
-                    response = app.response_class(response=json.dumps({"message": "Successfully deleted"}, indent=4),
-                                                  status=200,
-                                                  content_type='application/json')
-                    return response
-                else:
-                    response = app.response_class(response=json.dumps({"message": "Record Not Found"}, indent=4),
-                                                  status=404,
-                                                  content_type='application/json')
-                    return response
-            except Exception:
-                conn.rollback()
-                response = app.response_class(response=json.dumps({"message": "Failed"}, indent=4),
-                                              status=409,
-                                              content_type='application/json')
-                return response
+        data = request.get_json()
+        comment_id = data['comment_id']
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("""SELECT * from comments where comment_id == (?)""", (
+            comment_id))
+        row = c.fetchone()
+        if row:
+            c.execute("""DELETE from comments where comment_id  == (?)""", (
+                comment_id))
+            conn.commit()
+            response = app.response_class(response=json.dumps({"message": "OK"}, indent=4),
+                                          status=200,
+                                          content_type='application/json')
+            return response
         else:
-            error_msg = "Need User Authentication to perform the DELETE Operation"
-            response = app.response_class(response=json.dumps({"message": "Need User Authentication to perform the DELETE Operation"}, indent=4),
-                                          status=401,
+            response = app.response_class(response=json.dumps({"message": "Comment Not Found"}, indent=4),
+                                          status=404,
                                           content_type='application/json')
             return response
 
-# curl --include --verbose --request GET --header 'Content-Type: application/json' --data '{"article_id" : "3"}' http://localhost:5000/comments/getnumber
+
     def get(self):
         "Retrieve the number of comments on a given article"
 
@@ -154,7 +180,6 @@ class Comments(Resource):
             return jsonify(error_msg), 409
 
 
-# curl --include --verbose --request GET --header 'Content-Type: application/json' --data '{"article_id" : "3", "n" : "10"}' http://localhost:5000/comments/getn
 class N_Comments(Resource):
     def get(self):
         "Retrieve the n most recent comments on a URL"
@@ -184,4 +209,4 @@ api.add_resource(Comments, "/comments")
 api.add_resource(N_Comments, "/ncomments")
 
 if __name__ == '__main__':
-    app.run(debug = True, host = '0.0.0.0')
+    app.run(debug = True, host = '0.0.0.0', port = 5300)
