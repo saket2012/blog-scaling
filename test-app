@@ -1,0 +1,99 @@
+server {
+	listen      80;
+    	server_name _;
+	location /user {
+		auth_request /auth;
+		proxy_pass "http://user-server/user";	
+		if ($request_method = POST) {
+			rewrite .* /no-auth/user;	
+		}	
+	}
+
+	location /no-auth/user {
+		proxy_pass "http://user-server/user";
+	} 
+
+	location /no-auth/article {
+		proxy_pass "http://article-server/article";
+	}
+
+	location /no-auth/comment {
+		proxy_pass "http://comment-server/comment";
+	}
+
+	location /n-comments {
+		proxy_pass "http://comment-server/n-comments";
+	}
+
+	location /article {
+		auth_request /auth;
+		proxy_pass "http://article-server/article";
+		if ($request_method = GET) {
+			rewrite .* /no-auth/article;
+		}
+	}
+	
+	location /articles-data {
+		proxy_pass "http://article-server/articles-data";
+	}
+
+	location /articles-metadata {
+		proxy_pass "http://article-server/articles-metadata";
+	}
+
+	location /comment {
+		auth_request /auth;
+		proxy_pass "http://comment-server/comment";
+		if ($request_method = GET) {
+			rewrite .* /no-auth/comment;
+		}
+	}
+	
+	location /no-auth/tag {
+		proxy_pass "http://tag-server/tag";
+	}
+
+	location /tag-url {
+		proxy_pass "http://tag-server/tag-url";
+	}
+
+	location /tag {
+		auth_request /auth;
+		proxy_pass "http://tag-server/tag";
+		if ($request_method = GET) {
+			rewrite .* /no-auth/tag;
+		}
+	}
+	location = /auth {
+                internal;
+                proxy_pass              "http://127.0.0.1:5000/authenticate";
+                proxy_pass_request_body off;
+                proxy_set_header        Content-Length "";
+                proxy_set_header        X-Originali-URI $request_uri;
+        }	
+}
+
+upstream user-server {
+        server 127.0.0.1:5000;
+        server 127.0.0.1:5001;
+        server 127.0.0.1:5002;
+}
+
+
+upstream article-server {
+        server 127.0.0.1:5100;
+        server 127.0.0.1:5101;
+        server 127.0.0.1:5102;
+}
+
+upstream comment-server {
+        server 127.0.0.1:5200;
+        server 127.0.0.1:5201;
+        server 127.0.0.1:5202;
+}
+
+upstream tag-server {
+        server 127.0.0.1:5300;
+        server 127.0.0.1:5301;
+        server 127.0.0.1:5302;
+}
