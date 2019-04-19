@@ -1,39 +1,24 @@
-from flask import Flask, request, jsonify
-import articles_db
-import users_db, db_connection, tags_db
 import json
+
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
-from flask_httpauth import HTTPBasicAuth
-from passlib.hash import sha256_crypt
+
+import articles_db
+import db_connection
+import tags_db
 
 app = Flask(__name__)
 api = Api(app)
-auth = HTTPBasicAuth()
-
-
-@auth.verify_password
-def verify(username, password):
-    passwd = users_db.get_user_details(username)
-    if passwd:
-        passwd = passwd[0]
-        passwd = passwd[2]
-        if sha256_crypt.verify(password, passwd):
-            return True
-        else:
-            return False
-    else:
-        return False
 
 
 class Tags(Resource):
-
-    @auth.login_required
     def post(self):
         data = request.get_json()
         tag_name = data['tag_name']
         url = data['url']
+        username = request.authorization.username
         if tag_name == '' or url == '':
-            response = app.response_class(response=json.dumps({"message": "Bad Request"}, indent=4),
+            response = app.response_class(response = json.dumps({"message": "BAD REQUEST"}, indent = 4),
                                           status=400,
                                           content_type='application/json')
             return response
@@ -43,13 +28,12 @@ class Tags(Resource):
                                           status=404,
                                           content_type='application/json')
             return response
-        tags_db.post_tag(tag_name, url)
-        response = app.response_class(response=json.dumps({"message": "Created"}, indent=4),
+        tags_db.post_tag(username, tag_name, url)
+        response = app.response_class(response = json.dumps({"message": "CREATED"}, indent = 4),
                                       status=201,
                                       content_type='application/json')
         return response
 
-    @auth.login_required
     def delete(self):
         data = request.get_json()
         url = data['url']
@@ -105,9 +89,10 @@ class TagsByURL(Resource):
             return response
         return jsonify({"Tags": tags})
 
-api.add_resource(Tags, '/tags')
-api.add_resource(TagsByURL, '/tags_url')
+
+api.add_resource(Tags, '/tag')
+api.add_resource(TagsByURL, '/tag-url')
 
 if __name__ == '__main__':
     db_connection.create_tables()
-    app.run(debug = True, host = '0.0.0.0')
+    app.run(debug = True, host = '0.0.0.0', port = 5300)

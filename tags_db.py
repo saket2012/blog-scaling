@@ -1,22 +1,24 @@
-from db_connection import get_db
-import time, datetime
+import datetime
+import time
+
+from db_connection import get_db_tags
 
 
-def post_tag(tag_name, url):
-    conn = get_db()
+def post_tag(username, tag_name, url):
+    conn = get_db_tags()
     c = conn.cursor()
     unix = int(time.time())
     post_time = str(datetime.datetime.fromtimestamp(unix).strftime('%Y-%m-%d %H:%M:%S'))
     try:
-        c.execute("""INSERT INTO tags VALUES (NULL, ?, ?, ?)""", (
-            tag_name, url, post_time))
+        c.execute("""INSERT INTO tags VALUES (NULL, ?, ?, ?, ?)""", (
+            username, tag_name, url, post_time))
         conn.commit()
     except Exception:
         conn.rollback()
 
 
 def get_tag_details(url):
-    conn = get_db()
+    conn = get_db_tags()
     c = conn.cursor()
     try:
         c.execute("""SELECT * FROM tags where url = ?""", (url,))
@@ -29,7 +31,7 @@ def get_tag_details(url):
 
 
 def delete_tag(tag_id):
-    conn = get_db()
+    conn = get_db_tags()
     c = conn.cursor()
     try:
         c.execute("""DELETE FROM tags WHERE tag_id = ?""", (tag_id,))
@@ -39,7 +41,7 @@ def delete_tag(tag_id):
 
 
 def get_tag_by_url(url):
-    conn = get_db()
+    conn = get_db_tags()
     c = conn.cursor()
     try:
         c.execute("""SELECT * FROM tags where url = ?""", (url,))
@@ -52,7 +54,7 @@ def get_tag_by_url(url):
 
 
 def get_tag_by_tag_name(tag_name):
-    conn = get_db()
+    conn = get_db_tags()
     c = conn.cursor()
     try:
         c.execute("""SELECT tag_name, url FROM tags where tag_name = ?""", (tag_name,))
@@ -69,7 +71,7 @@ def get_tag_by_tag_name(tag_name):
 
 
 def get_tags_by_url(url):
-    conn = get_db()
+    conn = get_db_tags()
     c = conn.cursor()
     try:
         c.execute("""SELECT tag_name, url FROM tags where url = ?""", (url,))
@@ -86,7 +88,7 @@ def get_tags_by_url(url):
 
 
 def get_tags_metadata(n):
-    conn = get_db()
+    conn = get_db_tags()
     c = conn.cursor()
 
     c.execute(

@@ -1,10 +1,10 @@
-from db_connection import get_db
+from db_connection import get_db_users
 import hashlib
 from passlib.hash import sha256_crypt
 
 def create_user(username, password, display_name):
     hash_password = encode_password(password)
-    conn = get_db()
+    conn = get_db_users()
     c = conn.cursor()
     try:
         c.execute("""INSERT into users values (NULL, ?, ?, ?)""", (
@@ -16,7 +16,7 @@ def create_user(username, password, display_name):
 
 def update_password(username, new_password):
     hash_password = encode_password(new_password)
-    conn = get_db()
+    conn = get_db_users()
     c = conn.cursor()
     try:
         c.execute("""UPDATE users SET password = ? WHERE username = ?""", (
@@ -27,7 +27,7 @@ def update_password(username, new_password):
 
 
 def delete_user(username):
-    conn = get_db()
+    conn = get_db_users()
     c = conn.cursor()
     try:
         c.execute("""DELETE FROM users WHERE username = ?""", (username,))
@@ -37,7 +37,7 @@ def delete_user(username):
 
 
 def get_user_details(username):
-    conn = get_db()
+    conn = get_db_users()
     c = conn.cursor()
     c.execute("""SELECT * FROM users WHERE username = ?""", (username,))
     rows = c.fetchall()
