@@ -19,7 +19,6 @@ class Comments(Resource):
         username = request.authorization.username
         article_id = articles_db.get_article(article_name)
         if article_id:
-            print(11111)
             comments_db.post_comment(username, article_name, comment)
             response = app.response_class(response = json.dumps({"message": "CREATED"}, indent = 4),
                                           status = 201,

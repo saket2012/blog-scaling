@@ -1,26 +1,28 @@
-from db_connection import get_db
-import datetime, time
+import datetime
+import time
+
+from db_connection import get_db_articles
 
 
-def post_article(user_id, text, author, title, url):
-    conn = get_db()
+def post_article(username, text, author, title, url):
+    conn = get_db_articles()
     c = conn.cursor()
     unix = int(time.time())
     post_time = str(datetime.datetime.fromtimestamp(unix).strftime('%Y-%m-%d %H:%M:%S'))
     last_updated_time = str(datetime.datetime.fromtimestamp(unix).strftime('%Y-%m-%d %H:%M:%S'))
     try:
         c.execute("""INSERT INTO articles VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)""", (
-            user_id, text, author, title, url, post_time, last_updated_time))
+            username, text, author, title, url, post_time, last_updated_time))
         conn.commit()
     except Exception:
         conn.rollback()
 
 
-def get_article_details(user_id, title):
-    conn = get_db()
+def get_article_details(username, title):
+    conn = get_db_articles()
     c = conn.cursor()
     try:
-        c.execute("""SELECT * FROM articles where user_id = ? AND title = ?""", (user_id, title))
+        c.execute("""SELECT * FROM articles where username = ? AND title = ?""", (username, title))
         rows = c.fetchall()
         if len(rows) == 0:
             return False
@@ -30,7 +32,7 @@ def get_article_details(user_id, title):
 
 
 def get_article_by_url(url):
-    conn = get_db()
+    conn = get_db_articles()
     c = conn.cursor()
     try:
         c.execute("""SELECT * FROM articles where url = ?""", (url,))
@@ -42,22 +44,21 @@ def get_article_by_url(url):
         return e
 
 
-
-def edit_article(title, author, text, article_id):
-    conn = get_db()
+def edit_article(author, text, article_id):
+    conn = get_db_articles()
     c = conn.cursor()
     unix = int(time.time())
     last_updated_time = str(datetime.datetime.fromtimestamp(unix).strftime('%Y-%m-%d %H:%M:%S'))
     try:
-        c.execute("""UPDATE articles SET text = ?, author = ?, title = ?,last_updated_time = ? WHERE article_id = ?""",
-                  (text, author, title, last_updated_time, article_id))
+        c.execute("""UPDATE articles SET text = ?, author = ?,last_updated_time = ? WHERE article_id = ?""",
+                  (text, author, last_updated_time, article_id))
         conn.commit()
     except Exception:
         conn.rollback()
 
 
 def delete_article(article_id):
-    conn = get_db()
+    conn = get_db_articles()
     c = conn.cursor()
     try:
         c.execute("""DELETE FROM articles WHERE article_id = ?""", (article_id,))
@@ -67,7 +68,7 @@ def delete_article(article_id):
 
 
 def get_article(title):
-    conn = get_db()
+    conn = get_db_articles()
     c = conn.cursor()
     try:
         c.execute("""SELECT * FROM articles WHERE title = ? ORDER BY post_time desc""", (title,))
@@ -80,7 +81,7 @@ def get_article(title):
 
 
 def get_n_articles(n):
-    conn = get_db()
+    conn = get_db_articles()
     c = conn.cursor()
     c.execute(
         """SELECT text, author, title, post_time, last_updated_time FROM articles ORDER BY \
@@ -96,10 +97,9 @@ def get_n_articles(n):
 
 
 def get_articles_metadata(n):
-    conn = get_db()
+    conn = get_db_articles()
     c = conn.cursor()
-    c.execute(
-        """SELECT text, author, title FROM articles ORDER BY post_time desc LIMIT ?""", (n,))
+    c.execute("""SELECT text, author, title FROM articles ORDER BY post_time desc LIMIT ?""", (n,))
     rows = c.fetchall()
     if len(rows) == 0:
         return False

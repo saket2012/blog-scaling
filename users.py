@@ -1,7 +1,6 @@
 import json
 
 from flask import Flask, request
-from flask_httpauth import HTTPBasicAuth
 from flask_restful import Resource, Api
 from passlib.hash import sha256_crypt
 
@@ -9,7 +8,6 @@ import db_connection
 import users_db
 
 app = Flask(__name__)
-auth = HTTPBasicAuth()
 api = Api(app)
 
 
