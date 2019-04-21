@@ -1,4 +1,4 @@
-# Blog
+# Blog-Scaling
 
 1) Install the dependencies by using following command<br />
 pip3 install -r requirements.txt<br />
