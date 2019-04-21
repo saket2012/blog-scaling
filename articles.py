@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, Response
 from flask_restful import Resource, Api
 
 import articles_db
@@ -92,15 +92,17 @@ class Articles(Resource):
         title = data['title']
         # Check NULL condition of all fields
         if title == "":
-            response = app.response_class(response = json.dumps("BAD REQUEST", indent = 4),
+            response = app.response_class(response = json.dumps({"message": "BAD REQUEST"}, indent = 4),
                                           status = 400,
                                           content_type = 'application/json')
             return response
         article = articles_db.get_article(title)
         if not article:
             # Article not found
-            message = {'message': 'NOT FOUND'}
-            return jsonify(message)
+            response = app.response_class(response = json.dumps({"message": "NOT FOUND"}, indent = 4),
+                                          status = 404,
+                                          content_type = 'application/json')
+            return response
         article = article[0]
         title = article[4]
         author = article[3]
@@ -120,7 +122,7 @@ class NArticles(Resource):
         no_of_articles = data['no_of_articles']
         n_articles = articles_db.get_n_articles(no_of_articles)
         if not n_articles:
-            response = app.response_class(response = json.dumps("NOT FOUND", indent = 4),
+            response = app.response_class(response = json.dumps({"message": "NOT FOUND"}, indent = 4),
                                           status = 404,
                                           content_type = 'application/json')
             return response
@@ -131,12 +133,12 @@ class NArticles(Resource):
 
 
 class ArticleMetadata(Resource):
-    def get(self):
-        data = request.get_json()
-        no_of_articles = data['no_of_articles']
+    def get(self, no_of_articles):
+        # data = request.get_json()
+        # no_of_articles = data['no_of_articles']
         n_articles = articles_db.get_articles_metadata(no_of_articles)
         if not n_articles:
-            response = app.response_class(response = json.dumps("NOT FOUND", indent = 4),
+            response = app.response_class(response = json.dumps({"message": "NOT FOUND"}, indent = 4),
                                           status = 404,
                                           content_type = 'application/json')
             return response
@@ -148,7 +150,7 @@ class ArticleMetadata(Resource):
 
 api.add_resource(Articles, '/article')  # Route 1
 api.add_resource(NArticles, '/articles-data')  # Route 2
-api.add_resource(ArticleMetadata, '/articles-metadata')  # Route 3
+api.add_resource(ArticleMetadata, '/articles-metadata/<no_of_articles>')  # Route 3
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ api = Api(app)
 class Comments(Resource):
 
     def post(self):
+        print(111)
         data = request.get_json()
         comment = data['comment']
         article_name = data['article_name']
@@ -66,15 +67,15 @@ class Comments(Resource):
 
 
 class NComments(Resource):
-    def get(self):
+    def get(self, no_of_comments):
         # Retrieve the n most recent comments on a URL
         data = request.get_json()
         article_name = data['article_name']
-        no_of_comments = data['no_of_comments']
+        # no_of_comments = data['no_of_comments']
         comments = comments_db.get_comments(article_name, no_of_comments)
         if comments:
             response = app.response_class(response = json.dumps(comments, indent = 4),
-                                          status = 404,
+                                          status = 200,
                                           content_type = 'application/json')
             return response
         else:
@@ -85,7 +86,7 @@ class NComments(Resource):
 
 
 api.add_resource(Comments, "/comment")
-api.add_resource(NComments, "/n-comments")
+api.add_resource(NComments, "/n-comments/<no_of_comments>")
 
 if __name__ == '__main__':
     db_connection.create_tables()

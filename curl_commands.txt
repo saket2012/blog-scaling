@@ -1,55 +1,55 @@
 Users:
 
 1) Create a new user:
-curl -i --header "Content-Type: application/json" --request POST --data '{"username":"xyz@gmail.com", "password":"xyz", "display_name":"XYZ"}'   http://localhost:5000/users
+curl -i --header "Content-Type: application/json" --request POST --data '{"username":"xyz@gmail.com", "password":"xyz", "display_name":"XYZ"}'   http://localhost/user
 
 2) Update a user:
-curl -i --header "Content-Type: application/json" --request PATCH --user xyz@gmail.com:xyz --data '{"username":"xyz@gmail.com", "password":"123", "new_password":"XYZ"}'   http://localhost:5000/users
+curl -i --header "Content-Type: application/json" --request PATCH --user xyz@gmail.com:xyz --data '{"username":"xyz@gmail.com", "password":"123", "new_password":"XYZ"}'   http://localhost/user
 
 3) Delete a user:
-curl -i --header "Content-Type: application/json" --request DELETE --user x88yz@gmail.com:XYZ --data '{"username":"xyz@gmail.com", "password":"XYZ"}'   http://localhost:5000/users
+curl -i --header "Content-Type: application/json" --request DELETE --user x88yz@gmail.com:XYZ --data '{"username":"xyz@gmail.com", "password":"XYZ"}'   http://localhost/user
 
 
 Articles:
 1) Post an article
-curl -i --header "Content-Type: application/json" --request POST --user xyz@gmail.com:123 --data '{"text":"qwertyuiop", "author":"QWE", "title":"ABC", "url":"abc.com"}'   http://localhost:5100/articles
+curl -i --header "Content-Type: application/json" --request POST --user xyz@gmail.com:123 --data '{"text":"qwertyuiop", "author":"QWE", "title":"ABC", "url":"abc.com"}'   http://localhost/article
 
 2) Edit an article
-curl -i --header "Content-Type: application/json" --request PUT --user xyz@gmail.com:123 --data '{"text":"qweqwertyuwdqwdqwdqwiop", "author":"QWE", "title":"123456"}'   http://localhost:5100/articles
+curl -i --header "Content-Type: application/json" --request PUT --user xyz@gmail.com:123 --data '{"text":"qweqwertyuwdqwdqwdqwiop", "author":"QWE", "title":"123456"}'   http://localhost/article
 
 3) Delete an article
-curl -i --header "Content-Type: application/json" --request DELETE --user xyz8@gmail.com:123 --data '{"title":"qwe.mcom"}'   http://localhost:5100/articles
+curl -i --header "Content-Type: application/json" --request DELETE --user xyz8@gmail.com:123 --data '{"title":"qwecom"}'   http://localhost/article
 
 4) Get an article
-curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"title":"qwe.com"}'   http://localhost:5100/articles
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"title":"qwe.com"}'   http://localhost/article
 
 5) Get n articles
-curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data http://localhost:5100/articles/15
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data http://localhost/articles/15
 
 
 Tags:
 1) Post a new tag
-curl -i --header "Content-Type: application/json" --request POST --user xyz@gmail.com:123 --data '{"tag_name":"python", "url":"abc.com"}'   http://localhost:5300/tags
+curl -i --header "Content-Type: application/json" --request POST --user xyz@gmail.com:123 --data '{"tag_name":"python", "url":"abc.com"}'   http://localhost/tag
 
 2) Delete tag
-curl -i --header "Content-Type: application/json" --request DELETE --user xyz@gmail.com:123 --data '{ "url":"abc.com"}'   http://localhost:5300/tags
+curl -i --header "Content-Type: application/json" --request DELETE --user xyz@gmail.com:123 --data '{ "url":"abc.com"}'   http://localhost/tag
 
 3) Get url from tag name
-curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"tag_name":"python1"}'   http://localhost:5300/tags
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"tag_name":"python1"}'   http://localhost/tag
 
 4) Get tags from url
-curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"url":"abc.com"}'   http://localhost:5300/tags_url
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"url":"abc.com"}'   http://localhost/tags-url
 
 
 Comments:
 1. Post a Comment
-curl --include --verbose --request POST --header 'Content-Type: application/json' --user user1@gmail.com:123 --data '{"user_id":"1", "title":"title1", "author":"user1", "display_name":"user1", "comment":"This is a Comment"}' http://localhost:5200/comments
+curl -i --header "Content-Type: application/json" --request POST --user a6@gmail.com:12345 --data '{"article_name":"ABC", "comment":"this is my first comment"}'   http://localhost/comment
 
 2. Delete Command
-curl --include --verbose --request DELETE --header 'Content-Type: application/json' --user user1@gmail.com:123 --data '{"comment_id" : "2"}' http://localhost:5200/comments
+curl -i --header "Content-Type: application/json" --request DELETE --user a6@gmail.com:12345 --data '{"comment_id":1}'   http://localhost/comment
 
 3. Get the number of Comments on an article
-curl --include --verbose --request GET --header 'Content-Type: application/json' --data '{"article_id" : "1"}' http://localhost:5200/comments
+curl -i --header "Content-Type: application/json" --request GET  --data '{"article_name":"ABC"}'   http://localhost/comment
 
 4. Get n number of Comments
- curl --include --verbose --request GET --header 'Content-Type: application/json' --data '{"title" : "title1", "author": "user1", "n" : "3"}' http://localhost:5200/comments
+curl -i --header "Content-Type: application/json" --request GET  --data '{"article_name":"ABC"}'   http://localhost/n-comments/10
