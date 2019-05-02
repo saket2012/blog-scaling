@@ -54,7 +54,7 @@ def create_tables():
     query = """CREATE TABLE IF NOT EXISTS comments(
             comment_id integer PRIMARY KEY AUTOINCREMENT,
             username varchar,
-            article_name varchar,
+            article_id integer,
             comment varchar,
             post_time varchar)"""
     c_comments.execute(query)

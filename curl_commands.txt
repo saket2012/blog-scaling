@@ -15,16 +15,16 @@ Articles:
 curl -i --header "Content-Type: application/json" --request POST --user xyz@gmail.com:123 --data '{"text":"qwertyuiop", "author":"QWE", "title":"ABC", "url":"abc.com"}'   http://localhost/article
 
 2) Edit an article
-curl -i --header "Content-Type: application/json" --request PUT --user xyz@gmail.com:123 --data '{"text":"qweqwertyuwdqwdqwdqwiop", "author":"QWE", "title":"123456"}'   http://localhost/article
+curl -i --header "Content-Type: application/json" --request PUT --user xyz@gmail.com:123 --data '{"text":"qweqwertyuwdqwdqwdqwiop", "author":"QWE", "title":"123456"}'   http://localhost/article/12
 
 3) Delete an article
-curl -i --header "Content-Type: application/json" --request DELETE --user xyz8@gmail.com:123 --data '{"title":"qwecom"}'   http://localhost/article
+curl -i --header "Content-Type: application/json" --request DELETE --user xyz8@gmail.com:123    http://localhost/article/12
 
 4) Get an article
-curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data '{"title":"qwe.com"}'   http://localhost/article
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123   http://localhost/article/13
 
 5) Get n articles
-curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data http://localhost/articles/15
+curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail.com:123 --data http://localhost/articles-data/15
 
 
 Tags:
@@ -43,13 +43,13 @@ curl -i --header "Content-Type: application/json" --request GET --user xyz@gmail
 
 Comments:
 1. Post a Comment
-curl -i --header "Content-Type: application/json" --request POST --user a6@gmail.com:12345 --data '{"article_name":"ABC", "comment":"this is my first comment"}'   http://localhost/comment
+curl -i --header "Content-Type: application/json" --request POST --user a6@gmail.com:12345 --data '{"comment":"this is my first comment"}'   http://localhost/comment/4
 
 2. Delete Command
-curl -i --header "Content-Type: application/json" --request DELETE --user a6@gmail.com:12345 --data '{"comment_id":1}'   http://localhost/comment
+curl -i --header "Content-Type: application/json" --request DELETE --user a6@gmail.com:12345 --data    http://localhost/comment/3
 
 3. Get the number of Comments on an article
-curl -i --header "Content-Type: application/json" --request GET  --data '{"article_name":"ABC"}'   http://localhost/comment
+curl -i --header "Content-Type: application/json" --request GET   http://localhost:5200/comment/4
 
 4. Get n number of Comments
-curl -i --header "Content-Type: application/json" --request GET  --data '{"article_name":"ABC"}'   http://localhost/n-comments/10
+curl -i --header "Content-Type: application/json" --request GET   http://localhost/n-comments/4/10

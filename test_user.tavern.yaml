@@ -174,13 +174,11 @@ test_name: Retrieve recent article
 stages:
 - name: Retrieve recent article
   request:
-    url: http://localhost/article
+    url: http://localhost/get-article/1
     method: GET
     auth:
     - saket@gmail.com
     - asd
-    json:
-      title: 1st article
     headers:
       content-type: application/json
   response:

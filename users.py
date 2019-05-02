@@ -13,7 +13,6 @@ api = Api(app)
 
 class User(Resource):
     def post(self):
-        print("in user post")
         data = request.get_json()
         username = data['username']
         password = data['password']
@@ -40,7 +39,6 @@ class User(Resource):
             return response
 
     def patch(self):
-        print("user update")
         data = request.get_json()
         username = request.authorization.username
         new_password = data['new_password']
@@ -57,7 +55,6 @@ class User(Resource):
         return response
 
     def delete(self):
-        print("user delete")
         username = request.authorization.username
         users_db.delete_user(username)
         response = app.response_class(response = json.dumps({"message": "OK"}, indent = 4),

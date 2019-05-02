@@ -18,12 +18,25 @@ def post_article(username, text, author, title, url):
         conn.rollback()
 
 
-def get_article_details(username, title):
+def get_article_details(username, article_id):
     conn = get_db_articles()
     c = conn.cursor()
     try:
-        c.execute("""SELECT * FROM articles where username = ? AND title = ?""", (username, title))
+        c.execute("""SELECT * FROM articles where username = ? AND article_id = ?""", (username, article_id))
         rows = c.fetchall()
+        if len(rows) == 0:
+            return False
+        return rows
+    except Exception as e:
+        return e
+
+def get_article_by_id(article_id):
+    conn = get_db_articles()
+    c = conn.cursor()
+    try:
+        c.execute("""SELECT * FROM articles where article_id = ?""", (article_id,))
+        rows = c.fetchall()
+        print(rows)
         if len(rows) == 0:
             return False
         return rows
@@ -99,7 +112,7 @@ def get_n_articles(n):
 def get_articles_metadata(n):
     conn = get_db_articles()
     c = conn.cursor()
-    c.execute("""SELECT text, author, title FROM articles ORDER BY post_time desc LIMIT ?""", (n,))
+    c.execute("""SELECT article_id, text, author, title, url, post_time FROM articles ORDER BY post_time desc LIMIT ?""", (n,))
     rows = c.fetchall()
     if len(rows) == 0:
         return False

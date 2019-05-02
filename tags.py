@@ -73,9 +73,8 @@ class Tags(Resource):
 
 
 class TagsByURL(Resource):
-    def get(self):
+    def get(self, url):
         data = request.get_json()
-        url = data['url']
         if url == '':
             response = app.response_class(response=json.dumps({"message": "BAD REQUEST"}, indent=4),
                                           status=400,
@@ -91,7 +90,7 @@ class TagsByURL(Resource):
 
 
 api.add_resource(Tags, '/tag')
-api.add_resource(TagsByURL, '/tag-url')
+api.add_resource(TagsByURL, '/tag-url/<url>')
 
 if __name__ == '__main__':
     db_connection.create_tables()

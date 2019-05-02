@@ -41,9 +41,8 @@ test_name: Try to add a comment to an article that doesn’t exist
 stages:
 - name: Try to add a comment to an article that doesn’t exist
   request:
-    url: http://localhost/comment
+    url: http://localhost/comment/40
     json:
-      article_name: 3rd article
       comment: This is a comment
     method: POST
     auth:
@@ -60,10 +59,9 @@ test_name: Post an authenticated comment on an article
 stages:
 - name: Post an authenticated comment on an article
   request:
-    url: http://localhost/comment
+    url: http://localhost/comment/2
     json:
-      article_name: 1st article
-      comment: The article is motivative
+      comment: The article is very impressive
     method: POST
     auth:
     - user30@gmail.com

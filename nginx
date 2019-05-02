@@ -3,22 +3,18 @@ server {
     	server_name _;
 	location /user {
 		auth_request /auth;
-		proxy_pass "http://user-server/user";	
+		proxy_pass "http://user-server/user";
 		if ($request_method = POST) {
-			rewrite .* /no-auth/user;	
-		}	
+			rewrite .* /no-auth/user;
+		}
 	}
 
 	location /no-auth/user {
 		proxy_pass "http://user-server/user";
-	} 
+	}
 
 	location /no-auth/article {
 		proxy_pass "http://article-server/article";
-	}
-
-	location /no-auth/comment {
-		proxy_pass "http://comment-server/comment";
 	}
 
 	location /n-comments {
@@ -32,13 +28,17 @@ server {
 			rewrite .* /no-auth/article;
 		}
 	}
-	
+
 	location /articles-data {
 		proxy_pass "http://article-server/articles-data";
 	}
 
 	location /articles-metadata {
 		proxy_pass "http://article-server/articles-metadata";
+	}
+
+	location /get-article {
+		proxy_pass "http://article-server/get-article";
 	}
 
 	location /comment {
@@ -48,7 +48,16 @@ server {
 			rewrite .* /no-auth/comment;
 		}
 	}
-	
+
+	 location /no-auth/comment {
+                proxy_pass "http://comment-server/comment";
+        }
+
+	location /delete-comment {
+		auth_request /auth;
+		proxy_pass "http://comment-server/delete-comment";
+	}
+
 	location /no-auth/tag {
 		proxy_pass "http://tag-server/tag";
 	}
@@ -70,7 +79,7 @@ server {
                 proxy_pass_request_body off;
                 proxy_set_header        Content-Length "";
                 proxy_set_header        X-Originali-URI $request_uri;
-        }	
+        }
 }
 
 upstream user-server {
