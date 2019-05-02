@@ -11,9 +11,9 @@ sudo apt install --yes ruby-foreman<br />
 
 3) Start the application by typing following commands<br />
 On MacOS:<br />
-nf start user=3,article=3,tag=3,comment=3<br />
+nf start user=3,article=3,tag=3,comment=3,feed=1<br />
 On Ubuntu:<br />
-foreman start user=3,article=3,tag=3,comment=3<br />
+foreman start user=3,article=3,tag=3,comment=3,feed=1<br />
 
 4)Use the curl commands given in curl_commands.txt<br />
 
